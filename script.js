@@ -96,63 +96,44 @@ const elements = {
 // ===================================
 
 function init() {
-    // Unmute and try to start background music immediately
+    // Simple music initialization for mobile compatibility
     if (game.soundEnabled && game.bgMusic) {
-        game.bgMusic.muted = false;
+        console.log('🎵 Initializing music...');
+        
+        // Set volume but keep muted initially (helps with autoplay)
         game.bgMusic.volume = 0.5;
         
-        console.log('🎵 Attempting to load and play music...');
-        console.log('🎵 Audio readyState:', game.bgMusic.readyState);
-        console.log('🎵 Audio networkState:', game.bgMusic.networkState);
+        // Try to play (will be muted initially due to HTML attribute)
+        const playPromise = game.bgMusic.play();
         
-        // Force load on mobile
-        game.bgMusic.load();
+        if (playPromise !== undefined) {
+            playPromise.then(() => {
+                console.log('🎵 Audio element playing (muted)');
+                // Unmute after successful play
+                game.bgMusic.muted = false;
+                console.log('✅ Music unmuted and playing!');
+            }).catch(err => {
+                console.log('⚠️ Autoplay blocked:', err.message);
+                console.log('⚠️ Music will start on user interaction.');
+            });
+        }
         
-        // Wait for audio to be ready
-        const tryPlayMusic = () => {
-            console.log('🎵 Trying to play... readyState:', game.bgMusic.readyState);
-            
-            const playPromise = game.bgMusic.play();
-            
-            if (playPromise !== undefined) {
-                playPromise.then(() => {
-                    console.log('✅ Background music started successfully!');
-                }).catch(err => {
-                    console.log('⚠️ Autoplay blocked:', err.message);
-                    console.log('⚠️ Music will start on first interaction.');
-                    
-                    // Try to play on ANY user interaction
-                    const startMusic = () => {
-                        console.log('🎵 User interaction detected, attempting to play...');
-                        if (game.soundEnabled && game.bgMusic.paused) {
-                            game.bgMusic.play()
-                                .then(() => console.log('✅ Music started after user interaction!'))
-                                .catch(e => console.error('❌ Music still blocked:', e));
-                        }
-                    };
-                    
-                    // Listen for multiple interaction types
-                    document.addEventListener('click', startMusic, { once: true });
-                    document.addEventListener('touchstart', startMusic, { once: true });
-                    document.addEventListener('keydown', startMusic, { once: true });
-                });
+        // Fallback: Start music on any user interaction
+        const startMusicOnInteraction = () => {
+            console.log('🎵 User interaction - starting music...');
+            if (game.soundEnabled && game.bgMusic) {
+                game.bgMusic.muted = false;
+                if (game.bgMusic.paused) {
+                    game.bgMusic.play()
+                        .then(() => console.log('✅ Music started!'))
+                        .catch(e => console.error('❌ Music failed:', e.message));
+                }
             }
         };
         
-        // Try to play when audio is ready
-        if (game.bgMusic.readyState >= 3) {
-            // Audio is already loaded enough to play
-            tryPlayMusic();
-        } else {
-            // Wait for audio to load
-            game.bgMusic.addEventListener('canplaythrough', () => {
-                console.log('✅ Audio can play through - attempting playback');
-                tryPlayMusic();
-            }, { once: true });
-            
-            // Also try after a short delay as fallback
-            setTimeout(tryPlayMusic, 1000);
-        }
+        // Listen for user interactions
+        document.addEventListener('click', startMusicOnInteraction, { once: true });
+        document.addEventListener('touchstart', startMusicOnInteraction, { once: true });
     }
     
     setupAgeGate();
