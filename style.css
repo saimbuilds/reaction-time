@@ -1074,60 +1074,575 @@ body {
 /* ===================================
    RESPONSIVE DESIGN
    =================================== */
+
+/* Large tablets and small desktops */
+@media (max-width: 1024px) {
+    :root {
+        --spacing-xs: 0.4rem;
+        --spacing-sm: 0.8rem;
+        --spacing-md: 1.2rem;
+        --spacing-lg: 1.6rem;
+        --spacing-xl: 2.4rem;
+    }
+
+    .container {
+        padding: var(--spacing-lg);
+    }
+
+    .age-gate-content {
+        max-width: 500px;
+        padding: var(--spacing-lg);
+    }
+
+    .loading-content {
+        max-width: 500px;
+        padding: var(--spacing-lg);
+    }
+}
+
+/* Tablets */
 @media (max-width: 768px) {
+    :root {
+        font-size: 15px;
+    }
+
     .container {
         padding: var(--spacing-md);
     }
 
-    .stats-container {
-        grid-template-columns: 1fr;
+    /* Age Gate Responsive */
+    .age-gate-content {
+        max-width: 90%;
+        padding: var(--spacing-md);
+        margin: 0 var(--spacing-sm);
     }
 
+    .skull-icon {
+        font-size: 4rem;
+    }
+
+    .age-gate-title {
+        font-size: 2rem;
+    }
+
+    .age-gate-subtitle {
+        font-size: 1.2rem;
+    }
+
+    .age-gate-buttons {
+        flex-direction: column;
+        gap: var(--spacing-sm);
+    }
+
+    .age-btn {
+        width: 100%;
+        padding: 0.875rem 1.5rem;
+        font-size: 1rem;
+    }
+
+    .warning-list {
+        padding: var(--spacing-sm);
+    }
+
+    .warning-list li {
+        font-size: 0.9rem;
+    }
+
+    /* Loading Screen Responsive */
+    .loading-content {
+        max-width: 90%;
+        padding: var(--spacing-md);
+    }
+
+    .loading-skull {
+        font-size: 5rem;
+    }
+
+    .loading-title {
+        font-size: 1.6rem;
+    }
+
+    .loading-bar-container {
+        height: 25px;
+    }
+
+    .loading-text {
+        font-size: 1rem;
+    }
+
+    .loading-warnings p {
+        font-size: 1rem;
+    }
+
+    /* Stats Grid */
+    .stats-container {
+        grid-template-columns: 1fr;
+        gap: var(--spacing-sm);
+    }
+
+    .stat-card {
+        padding: var(--spacing-sm);
+    }
+
+    .stat-label {
+        font-size: 0.8rem;
+    }
+
+    .stat-value {
+        font-size: 1.75rem;
+    }
+
+    /* Game Box */
     .game-box {
         min-height: 350px;
         padding: var(--spacing-lg);
     }
 
-    .instruction-grid {
-        grid-template-columns: 1fr;
+    .icon {
+        font-size: 3.5rem;
     }
 
+    /* Instructions */
+    .instruction-grid {
+        grid-template-columns: 1fr;
+        gap: var(--spacing-sm);
+    }
+
+    .instructions h3 {
+        font-size: 1.3rem;
+    }
+
+    .instruction-item {
+        padding: var(--spacing-sm);
+    }
+
+    .step-number {
+        width: 2rem;
+        height: 2rem;
+        font-size: 1rem;
+    }
+
+    .instruction-item p {
+        font-size: 0.9rem;
+    }
+
+    /* Buttons */
     .btn {
         padding: 0.875rem 2rem;
         font-size: 1rem;
     }
 
+    /* Sound Toggle */
     .sound-toggle {
         width: 45px;
         height: 45px;
         font-size: 1.3rem;
+        top: 15px;
+        right: 15px;
+    }
+
+    /* Header */
+    .header {
+        margin-bottom: var(--spacing-lg);
+    }
+
+    .subtitle {
+        font-size: 1rem;
+    }
+
+    .warning {
+        font-size: 0.95rem;
     }
 }
 
+/* Mobile devices */
 @media (max-width: 480px) {
-    .game-box {
-        min-height: 300px;
+    :root {
+        font-size: 14px;
+        --spacing-xs: 0.3rem;
+        --spacing-sm: 0.6rem;
+        --spacing-md: 1rem;
+        --spacing-lg: 1.4rem;
+        --spacing-xl: 2rem;
+    }
+
+    body {
+        line-height: 1.5;
+    }
+
+    .container {
+        padding: var(--spacing-sm);
+    }
+
+    /* Age Gate Mobile */
+    .age-gate-content {
+        max-width: 95%;
+        padding: var(--spacing-md);
+        margin: 0 var(--spacing-xs);
+    }
+
+    .skull-icon {
+        font-size: 3.5rem;
+    }
+
+    .age-gate-title {
+        font-size: 1.6rem;
+        margin: var(--spacing-sm) 0;
+    }
+
+    .age-gate-subtitle {
+        font-size: 1rem;
+        margin-bottom: var(--spacing-sm);
+    }
+
+    .age-gate-text {
+        font-size: 0.95rem;
+        margin: var(--spacing-sm) 0;
+    }
+
+    .warning-list {
+        padding: var(--spacing-sm);
+        margin: var(--spacing-sm) 0;
+    }
+
+    .warning-list li {
+        font-size: 0.85rem;
+        padding: var(--spacing-xs);
+    }
+
+    .age-gate-question {
+        font-size: 1.1rem;
+        margin: var(--spacing-md) 0;
+    }
+
+    .age-btn {
+        padding: 0.75rem 1.25rem;
+        font-size: 0.9rem;
+    }
+
+    .age-gate-disclaimer {
+        font-size: 0.75rem;
+    }
+
+    /* Loading Screen Mobile */
+    .loading-content {
+        max-width: 95%;
         padding: var(--spacing-md);
     }
 
-    .icon {
-        font-size: 3rem;
+    .loading-skull {
+        font-size: 4rem;
+    }
+
+    .loading-title {
+        font-size: 1.4rem;
+        margin: var(--spacing-md) 0;
+        letter-spacing: 0.1em;
+    }
+
+    .loading-bar-container {
+        height: 20px;
+        margin: var(--spacing-md) 0;
+    }
+
+    .loading-text {
+        font-size: 0.9rem;
+        margin: var(--spacing-sm) 0;
+    }
+
+    .loading-warnings {
+        margin-top: var(--spacing-md);
+    }
+
+    .loading-warnings p {
+        font-size: 0.9rem;
+        margin: var(--spacing-xs) 0;
+    }
+
+    /* Header Mobile */
+    .header {
+        margin-bottom: var(--spacing-md);
+    }
+
+    .title {
+        font-size: 1.8rem;
+        letter-spacing: 0.1em;
+        margin-bottom: var(--spacing-xs);
+    }
+
+    .subtitle {
+        font-size: 0.9rem;
+        letter-spacing: 0.05em;
+    }
+
+    .warning {
+        font-size: 0.85rem;
+        margin-top: var(--spacing-xs);
+    }
+
+    /* Stats Mobile */
+    .stats-container {
+        gap: var(--spacing-xs);
+        margin-bottom: var(--spacing-md);
+    }
+
+    .stat-card {
+        padding: var(--spacing-sm);
+    }
+
+    .stat-label {
+        font-size: 0.7rem;
+        margin-bottom: 0.25rem;
     }
 
     .stat-value {
         font-size: 1.5rem;
     }
 
-    .title {
-        font-size: 2rem;
+    /* Game Box Mobile */
+    .game-box {
+        min-height: 280px;
+        padding: var(--spacing-md);
+        border-width: 2px;
     }
 
+    .icon {
+        font-size: 3rem;
+        margin-bottom: var(--spacing-sm);
+    }
+
+    #gameTitle {
+        font-size: 1.4rem;
+        margin-bottom: var(--spacing-sm);
+        letter-spacing: 0.1em;
+    }
+
+    #gameMessage {
+        font-size: 0.95rem;
+        margin-bottom: var(--spacing-md);
+        line-height: 1.6;
+    }
+
+    /* Buttons Mobile */
+    .btn {
+        padding: 0.75rem 1.5rem;
+        font-size: 0.9rem;
+        border-width: 2px;
+    }
+
+    /* Instructions Mobile */
+    .instructions {
+        padding: var(--spacing-md);
+        margin-bottom: var(--spacing-md);
+    }
+
+    .instructions h3 {
+        font-size: 1.2rem;
+        margin-bottom: var(--spacing-sm);
+    }
+
+    .instruction-grid {
+        gap: var(--spacing-xs);
+    }
+
+    .instruction-item {
+        padding: var(--spacing-xs);
+    }
+
+    .step-number {
+        width: 1.8rem;
+        height: 1.8rem;
+        font-size: 0.9rem;
+    }
+
+    .instruction-item p {
+        font-size: 0.85rem;
+    }
+
+    /* Sound Toggle Mobile */
     .sound-toggle {
         top: 10px;
         right: 10px;
         width: 40px;
         height: 40px;
         font-size: 1.2rem;
+    }
+
+    /* Footer Mobile */
+    .footer {
+        padding: var(--spacing-md) 0;
+        font-size: 0.8rem;
+    }
+
+    .footer-warning {
+        font-size: 0.9rem;
+    }
+
+    /* Blood Drip Mobile */
+    .blood-drip {
+        height: 60px;
+    }
+
+    /* Spider animations - reduce size on mobile */
+    .spiders::before,
+    .spiders::after {
+        font-size: 1.5rem;
+    }
+}
+
+/* Extra small devices */
+@media (max-width: 360px) {
+    :root {
+        font-size: 13px;
+    }
+
+    .age-gate-content {
+        padding: var(--spacing-sm);
+    }
+
+    .skull-icon {
+        font-size: 3rem;
+    }
+
+    .age-gate-title {
+        font-size: 1.4rem;
+    }
+
+    .loading-skull {
+        font-size: 3.5rem;
+    }
+
+    .loading-title {
+        font-size: 1.2rem;
+    }
+
+    .title {
+        font-size: 1.6rem;
+    }
+
+    .game-box {
+        min-height: 250px;
+        padding: var(--spacing-sm);
+    }
+
+    .icon {
+        font-size: 2.5rem;
+    }
+
+    #gameTitle {
+        font-size: 1.2rem;
+    }
+
+    #gameMessage {
+        font-size: 0.85rem;
+    }
+
+    .btn {
+        padding: 0.65rem 1.25rem;
+        font-size: 0.85rem;
+    }
+
+    .stat-value {
+        font-size: 1.3rem;
+    }
+
+    .sound-toggle {
+        width: 36px;
+        height: 36px;
+        font-size: 1.1rem;
+    }
+}
+
+/* Landscape orientation for mobile devices */
+@media (max-height: 500px) and (orientation: landscape) {
+    .age-gate-content {
+        max-height: 90vh;
+        overflow-y: auto;
+        padding: var(--spacing-sm);
+    }
+
+    .loading-content {
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+
+    .skull-icon,
+    .loading-skull {
+        font-size: 3rem;
+    }
+
+    .age-gate-title,
+    .loading-title {
+        font-size: 1.3rem;
+        margin: var(--spacing-xs) 0;
+    }
+
+    .warning-list {
+        margin: var(--spacing-xs) 0;
+    }
+
+    .age-gate-buttons {
+        margin: var(--spacing-sm) 0;
+    }
+
+    .game-box {
+        min-height: 200px;
+    }
+
+    .header {
+        margin-bottom: var(--spacing-sm);
+    }
+
+    .stats-container {
+        margin-bottom: var(--spacing-sm);
+    }
+
+    .instructions {
+        margin-bottom: var(--spacing-sm);
+    }
+}
+
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+
+    /* Increase touch targets */
+    .btn {
+        min-height: 44px;
+        padding: 1rem 2rem;
+    }
+
+    .age-btn {
+        min-height: 48px;
+    }
+
+    .sound-toggle {
+        min-width: 44px;
+        min-height: 44px;
+    }
+
+    .game-box.state-ready {
+        cursor: pointer;
+        /* Add visual feedback for touch */
+        -webkit-tap-highlight-color: rgba(0, 255, 0, 0.2);
+    }
+
+    /* Remove hover effects on touch devices */
+    .btn:hover::before {
+        width: 0;
+        height: 0;
+    }
+
+    /* Better touch feedback */
+    .btn:active {
+        transform: scale(0.98);
+    }
+
+    .age-btn:active {
+        transform: scale(0.98);
+    }
+
+    .sound-toggle:active {
+        transform: scale(0.95);
     }
 }
 
