@@ -37,9 +37,32 @@ const game = {
 // Get the HTML audio element for background music
 const bgMusic = document.getElementById('bgMusicElement');
 if (bgMusic) {
+    console.log('🎵 Audio element found:', bgMusic);
+    console.log('🎵 Audio source:', bgMusic.querySelector('source')?.src);
+    
     bgMusic.volume = 0.5; // 50% volume for background
     // Unmute immediately to start playing
     bgMusic.muted = false;
+    
+    // Add event listeners for debugging
+    bgMusic.addEventListener('loadeddata', () => {
+        console.log('✅ Audio loaded successfully!');
+    });
+    
+    bgMusic.addEventListener('error', (e) => {
+        console.error('❌ Audio loading error:', e);
+        console.error('❌ Audio error details:', bgMusic.error);
+    });
+    
+    bgMusic.addEventListener('play', () => {
+        console.log('▶️ Audio started playing');
+    });
+    
+    bgMusic.addEventListener('pause', () => {
+        console.log('⏸️ Audio paused');
+    });
+} else {
+    console.error('❌ Audio element not found!');
 }
 
 // Create evil sound effect audio element
@@ -78,29 +101,57 @@ function init() {
         game.bgMusic.muted = false;
         game.bgMusic.volume = 0.5;
         
-        // Try to play immediately
-        const playPromise = game.bgMusic.play();
+        console.log('🎵 Attempting to load and play music...');
+        console.log('🎵 Audio readyState:', game.bgMusic.readyState);
+        console.log('🎵 Audio networkState:', game.bgMusic.networkState);
         
-        if (playPromise !== undefined) {
-            playPromise.then(() => {
-                console.log('🎵 Background music started successfully!');
-            }).catch(err => {
-                console.log('⚠️ Autoplay blocked. Music will start on first interaction.');
-                
-                // Try to play on ANY user interaction
-                const startMusic = () => {
-                    if (game.soundEnabled && game.bgMusic.paused) {
-                        game.bgMusic.play()
-                            .then(() => console.log('🎵 Music started after user interaction!'))
-                            .catch(e => console.log('Music still blocked:', e));
-                    }
-                };
-                
-                // Listen for multiple interaction types
-                document.addEventListener('click', startMusic, { once: true });
-                document.addEventListener('touchstart', startMusic, { once: true });
-                document.addEventListener('keydown', startMusic, { once: true });
-            });
+        // Force load on mobile
+        game.bgMusic.load();
+        
+        // Wait for audio to be ready
+        const tryPlayMusic = () => {
+            console.log('🎵 Trying to play... readyState:', game.bgMusic.readyState);
+            
+            const playPromise = game.bgMusic.play();
+            
+            if (playPromise !== undefined) {
+                playPromise.then(() => {
+                    console.log('✅ Background music started successfully!');
+                }).catch(err => {
+                    console.log('⚠️ Autoplay blocked:', err.message);
+                    console.log('⚠️ Music will start on first interaction.');
+                    
+                    // Try to play on ANY user interaction
+                    const startMusic = () => {
+                        console.log('🎵 User interaction detected, attempting to play...');
+                        if (game.soundEnabled && game.bgMusic.paused) {
+                            game.bgMusic.play()
+                                .then(() => console.log('✅ Music started after user interaction!'))
+                                .catch(e => console.error('❌ Music still blocked:', e));
+                        }
+                    };
+                    
+                    // Listen for multiple interaction types
+                    document.addEventListener('click', startMusic, { once: true });
+                    document.addEventListener('touchstart', startMusic, { once: true });
+                    document.addEventListener('keydown', startMusic, { once: true });
+                });
+            }
+        };
+        
+        // Try to play when audio is ready
+        if (game.bgMusic.readyState >= 3) {
+            // Audio is already loaded enough to play
+            tryPlayMusic();
+        } else {
+            // Wait for audio to load
+            game.bgMusic.addEventListener('canplaythrough', () => {
+                console.log('✅ Audio can play through - attempting playback');
+                tryPlayMusic();
+            }, { once: true });
+            
+            // Also try after a short delay as fallback
+            setTimeout(tryPlayMusic, 1000);
         }
     }
     
