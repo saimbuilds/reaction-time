@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Test your reaction time in this haunted horror-themed game. Dare to click when the spirits awaken!">
-    <title>👻 Haunted Reaction - Escape the Darkness</title>
+    <meta name="description" content="EXTREME HORROR - Test your reaction time in this terrifying 18+ horror experience. Not for the faint of heart.">
+    <title>💀 ESCAPE OR DIE - EXTREME HORROR 💀</title>
     
     <!-- Google Fonts - Creepy Horror Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -14,10 +14,54 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <!-- Background Music - Autoplay -->
+    <audio id="bgMusicElement" autoplay loop muted>
+        <source src="kyrie.mp3" type="audio/mpeg">
+    </audio>
+    
+    <!-- 18+ AGE GATE -->
+    <div class="age-gate" id="ageGate">
+        <div class="age-gate-content">
+            <div class="skull-icon">💀</div>
+            <h1 class="age-gate-title">⚠️ WARNING ⚠️</h1>
+            <h2 class="age-gate-subtitle">EXTREME ADULT HORROR CONTENT</h2>
+            <p class="age-gate-text">This experience contains:</p>
+            <ul class="warning-list">
+                <li>🩸 Graphic horror imagery and themes</li>
+                <li>👻 Disturbing sound effects</li>
+                <li>💀 Intense psychological horror</li>
+                <li>⚰️ Death and violence references</li>
+            </ul>
+            <p class="age-gate-question">Are you 18 years or older?</p>
+            <div class="age-gate-buttons">
+                <button class="age-btn age-yes" id="ageYes">YES - I AM 18+</button>
+                <button class="age-btn age-no" id="ageNo">NO - GET ME OUT</button>
+            </div>
+            <p class="age-gate-disclaimer">⚠️ By entering, you acknowledge this is EXTREME horror content ⚠️</p>
+        </div>
+    </div>
+
+    <!-- LOADING SCREEN -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loading-content">
+            <div class="loading-skull">💀</div>
+            <h2 class="loading-title">ENTERING THE NIGHTMARE...</h2>
+            <div class="loading-bar-container">
+                <div class="loading-bar" id="loadingBar"></div>
+            </div>
+            <p class="loading-text" id="loadingText">Awakening the demons...</p>
+            <div class="loading-warnings">
+                <p class="glitch">⚠️ TURN UP YOUR VOLUME ⚠️</p>
+                <p class="glitch">🩸 PREPARE FOR TERROR 🩸</p>
+            </div>
+        </div>
+    </div>
+
     <!-- Haunted animated background -->
     <div class="background-gradient"></div>
     <div class="fog"></div>
     <div class="spiders"></div>
+    <div class="blood-splatter"></div>
     
     <!-- Sound toggle button -->
     <button class="sound-toggle" id="soundToggle" aria-label="Toggle sound">
@@ -25,13 +69,13 @@
     </button>
     
     <!-- Main container -->
-    <div class="container">
+    <div class="container" id="mainContent" style="display: none;">
         <!-- Header -->
         <header class="header">
             <div class="blood-drip"></div>
-            <h1 class="title">💀 ESCAPE OR DIE 💀</h1>
+            <h1 class="title glitch-text">💀 ESCAPE OR DIE 💀</h1>
             <p class="subtitle">⚰️ THE DEAD ARE WATCHING... REACT OR PERISH ⚰️</p>
-            <p class="warning">🩸 WARNING: EXTREME HORROR AHEAD 🩸</p>
+            <p class="warning">🩸 EXTREME HORROR - 18+ ONLY 🩸</p>
         </header>
 
         <!-- Stats Display -->

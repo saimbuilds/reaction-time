@@ -2,9 +2,6 @@
 // GAME STATE MANAGEMENT
 // ===================================
 
-/**
- * Game states enum for clear state management
- */
 const GameState = {
     IDLE: 'idle',
     WAITING: 'waiting',
@@ -13,207 +10,208 @@ const GameState = {
     EARLY: 'early'
 };
 
-/**
- * Main game object to manage all game logic and state
- */
 const game = {
     state: GameState.IDLE,
     startTime: null,
     timeoutId: null,
     reactionTimes: [],
     bestTime: localStorage.getItem('bestTime') || null,
-    soundEnabled: localStorage.getItem('soundEnabled') !== 'false', // Default true
+    soundEnabled: localStorage.getItem('soundEnabled') !== 'false',
+    ageVerified: false,
     
-    // Configuration
+    // Audio elements
+    bgMusic: null,
+    evilSound: null,
+    
     config: {
-        minDelay: 500,      // Minimum delay before color change (ms)
-        maxDelay: 2000,     // Maximum delay before color change (ms)
-        maxAttempts: 100    // For average calculation
+        minDelay: 500,
+        maxDelay: 2000,
+        maxAttempts: 100
     }
 };
 
 // ===================================
-// SOUND EFFECTS (Web Audio API)
+// AUDIO FILES SETUP
 // ===================================
 
-/**
- * Create sound effects using Web Audio API
- */
-const AudioContext = window.AudioContext || window.webkitAudioContext;
-const audioContext = new AudioContext();
+// Get the HTML audio element for background music
+const bgMusic = document.getElementById('bgMusicElement');
+if (bgMusic) {
+    bgMusic.volume = 0.5; // 50% volume for background
+    // Unmute immediately to start playing
+    bgMusic.muted = false;
+}
 
-const sounds = {
-    /**
-     * Play creepy ambient sound
-     */
-    ambient: () => {
-        if (!game.soundEnabled) return;
-        const oscillator = audioContext.createOscillator();
-        const gainNode = audioContext.createGain();
-        
-        oscillator.type = 'sine';
-        oscillator.frequency.setValueAtTime(100, audioContext.currentTime);
-        oscillator.frequency.exponentialRampToValueAtTime(50, audioContext.currentTime + 2);
-        
-        gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 2);
-        
-        oscillator.connect(gainNode);
-        gainNode.connect(audioContext.destination);
-        
-        oscillator.start();
-        oscillator.stop(audioContext.currentTime + 2);
-    },
-    
-    /**
-     * Play heartbeat sound
-     */
-    heartbeat: () => {
-        if (!game.soundEnabled) return;
-        const oscillator = audioContext.createOscillator();
-        const gainNode = audioContext.createGain();
-        
-        oscillator.type = 'sine';
-        oscillator.frequency.setValueAtTime(80, audioContext.currentTime);
-        
-        gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
-        
-        oscillator.connect(gainNode);
-        gainNode.connect(audioContext.destination);
-        
-        oscillator.start();
-        oscillator.stop(audioContext.currentTime + 0.1);
-    },
-    
-    /**
-     * Play scream/alert sound
-     */
-    scream: () => {
-        if (!game.soundEnabled) return;
-        const oscillator = audioContext.createOscillator();
-        const gainNode = audioContext.createGain();
-        
-        oscillator.type = 'sawtooth';
-        oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
-        oscillator.frequency.exponentialRampToValueAtTime(400, audioContext.currentTime + 0.3);
-        
-        gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
-        
-        oscillator.connect(gainNode);
-        gainNode.connect(audioContext.destination);
-        
-        oscillator.start();
-        oscillator.stop(audioContext.currentTime + 0.3);
-    },
-    
-    /**
-     * Play success/escape sound
-     */
-    escape: () => {
-        if (!game.soundEnabled) return;
-        const oscillator = audioContext.createOscillator();
-        const gainNode = audioContext.createGain();
-        
-        oscillator.type = 'sine';
-        oscillator.frequency.setValueAtTime(400, audioContext.currentTime);
-        oscillator.frequency.exponentialRampToValueAtTime(800, audioContext.currentTime + 0.2);
-        
-        gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.2);
-        
-        oscillator.connect(gainNode);
-        gainNode.connect(audioContext.destination);
-        
-        oscillator.start();
-        oscillator.stop(audioContext.currentTime + 0.2);
-    },
-    
-    /**
-     * Play error/death sound
-     */
-    death: () => {
-        if (!game.soundEnabled) return;
-        const oscillator = audioContext.createOscillator();
-        const gainNode = audioContext.createGain();
-        
-        oscillator.type = 'sawtooth';
-        oscillator.frequency.setValueAtTime(200, audioContext.currentTime);
-        oscillator.frequency.exponentialRampToValueAtTime(50, audioContext.currentTime + 0.5);
-        
-        gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
-        
-        oscillator.connect(gainNode);
-        gainNode.connect(audioContext.destination);
-        
-        oscillator.start();
-        oscillator.stop(audioContext.currentTime + 0.5);
-    }
-};
+// Create evil sound effect audio element
+const evilSound = new Audio('evil.mp3');
+evilSound.volume = 0.7; // 70% volume for effect
+
+// Store in game object
+game.bgMusic = bgMusic;
+game.evilSound = evilSound;
+
+
 
 // ===================================
 // DOM ELEMENTS
 // ===================================
 
 const elements = {
-    gameBox: document.getElementById('gameBox'),
-    gameContent: document.getElementById('gameContent'),
-    gameTitle: document.getElementById('gameTitle'),
-    gameMessage: document.getElementById('gameMessage'),
-    startBtn: document.getElementById('startBtn'),
-    currentTime: document.getElementById('currentTime'),
-    bestTime: document.getElementById('bestTime'),
-    avgTime: document.getElementById('avgTime'),
-    soundToggle: document.getElementById('soundToggle')
+    gameBox: null,
+    gameContent: null,
+    gameTitle: null,
+    gameMessage: null,
+    startBtn: null,
+    currentTime: null,
+    bestTime: null,
+    avgTime: null,
+    soundToggle: null
 };
 
 // ===================================
 // INITIALIZATION
 // ===================================
 
-/**
- * Initialize the game when DOM is loaded
- */
 function init() {
-    // Display best time if it exists
-    updateStatsDisplay();
+    // Start background music immediately
+    if (game.soundEnabled) {
+        game.bgMusic.play().catch(err => {
+            console.log('Background music autoplay blocked. Will retry on user interaction.');
+            // Retry on first user interaction
+            document.addEventListener('click', () => {
+                if (game.soundEnabled && game.bgMusic.paused) {
+                    game.bgMusic.play().catch(e => console.log('Still blocked:', e));
+                }
+            }, { once: true });
+        });
+    }
     
-    // Set up event listeners
+    setupAgeGate();
+}
+
+// ===================================
+// AGE GATE & LOADING SCREEN
+// ===================================
+
+function setupAgeGate() {
+    const ageGate = document.getElementById('ageGate');
+    const ageYes = document.getElementById('ageYes');
+    const ageNo = document.getElementById('ageNo');
+    
+    ageYes.addEventListener('click', () => {
+        game.ageVerified = true;
+        ageGate.style.animation = 'fadeOut 0.5s ease forwards';
+        setTimeout(() => {
+            ageGate.style.display = 'none';
+            showLoadingScreen();
+        }, 500);
+    });
+    
+    ageNo.addEventListener('click', () => {
+        document.body.innerHTML = `
+            <div style="display: flex; align-items: center; justify-content: center; height: 100vh; background: #000; color: #fff; text-align: center; font-family: Georgia, serif;">
+                <div>
+                    <h1 style="font-size: 3rem; margin-bottom: 2rem;">👋 Goodbye</h1>
+                    <p style="font-size: 1.5rem;">This content is not suitable for you.</p>
+                    <p style="margin-top: 2rem; color: #888;">You can close this tab now.</p>
+                </div>
+            </div>
+        `;
+    });
+}
+
+function showLoadingScreen() {
+    const loadingScreen = document.getElementById('loadingScreen');
+    const loadingBar = document.getElementById('loadingBar');
+    const loadingText = document.getElementById('loadingText');
+    
+    const horrorMessages = [
+        'Awakening the demons...',
+        'Opening the gates of hell...',
+        'Summoning dark spirits...',
+        'Preparing your nightmare...',
+        'The dead are rising...',
+        'Blood is boiling...',
+        'Darkness approaches...',
+        'Your soul is ours...'
+    ];
+    
+    let progress = 0;
+    let messageIndex = 0;
+    
+    const loadingInterval = setInterval(() => {
+        progress += Math.random() * 15 + 5;
+        
+        if (progress >= 100) {
+            progress = 100;
+            clearInterval(loadingInterval);
+            // Sound removed
+            setTimeout(() => {
+                loadingScreen.style.animation = 'fadeOut 0.8s ease forwards';
+                setTimeout(() => {
+                    loadingScreen.style.display = 'none';
+                    initializeGame();
+                }, 800);
+            }, 500);
+        }
+        
+        loadingBar.style.width = progress + '%';
+        
+        if (progress > (messageIndex + 1) * 12.5 && messageIndex < horrorMessages.length - 1) {
+            messageIndex++;
+            loadingText.textContent = horrorMessages[messageIndex];
+            // Sound effects removed
+        }
+    }, 200);
+}
+
+function initializeGame() {
+    const mainContent = document.getElementById('mainContent');
+    mainContent.style.display = 'block';
+    mainContent.style.animation = 'fadeIn 1s ease';
+    
+    // Initialize DOM elements
+    elements.gameBox = document.getElementById('gameBox');
+    elements.gameContent = document.getElementById('gameContent');
+    elements.gameTitle = document.getElementById('gameTitle');
+    elements.gameMessage = document.getElementById('gameMessage');
+    elements.startBtn = document.getElementById('startBtn');
+    elements.currentTime = document.getElementById('currentTime');
+    elements.bestTime = document.getElementById('bestTime');
+    elements.avgTime = document.getElementById('avgTime');
+    elements.soundToggle = document.getElementById('soundToggle');
+    
+    updateStatsDisplay();
     elements.startBtn.addEventListener('click', startGame);
     elements.gameBox.addEventListener('click', handleGameBoxClick);
     elements.soundToggle.addEventListener('click', toggleSound);
-    
-    // Update sound toggle button
     updateSoundButton();
     
-    // Play ambient sound on init
-    sounds.ambient();
+    // Start background music
+    if (game.soundEnabled) {
+        game.bgMusic.play().catch(err => console.log('Background music autoplay blocked:', err));
+    }
     
-    console.log('👻 Haunted Reaction Game initialized!');
+    console.log('💀 EXTREME HORROR GAME INITIALIZED 💀');
 }
 
 // ===================================
 // SOUND CONTROL
 // ===================================
 
-/**
- * Toggle sound on/off
- */
 function toggleSound() {
     game.soundEnabled = !game.soundEnabled;
     localStorage.setItem('soundEnabled', game.soundEnabled);
     updateSoundButton();
     
     if (game.soundEnabled) {
-        sounds.ambient();
+        // Sound removed
+        game.bgMusic.play().catch(err => console.log('Background music blocked:', err));
+    } else {
+        game.bgMusic.pause();
     }
 }
 
-/**
- * Update sound button appearance
- */
 function updateSoundButton() {
     if (game.soundEnabled) {
         elements.soundToggle.textContent = '🔊';
@@ -228,169 +226,143 @@ function updateSoundButton() {
 // GAME FLOW FUNCTIONS
 // ===================================
 
-/**
- * Start a new game round
- */
 function startGame(event) {
-    // Prevent event bubbling to game box
     if (event) {
         event.stopPropagation();
     }
     
-    // Clear any existing timeout
     if (game.timeoutId) {
         clearTimeout(game.timeoutId);
     }
     
-    // Play heartbeat sound
-    sounds.heartbeat();
+    // Sound effects removed
     
-    // Set state to waiting
     game.state = GameState.WAITING;
     updateGameUI({
         icon: '👁️',
-        title: 'The Spirit Awakens...',
-        message: 'Wait for the darkness to turn green... then ESCAPE!',
+        title: 'THE DEMON AWAKENS...',
+        message: 'Wait for the blood to turn green... or face eternal damnation!',
         showButton: false
     });
     
-    // Generate random delay
     const delay = getRandomDelay();
     
-    // Set timeout to change to ready state
     game.timeoutId = setTimeout(() => {
         if (game.state === GameState.WAITING) {
             setReadyState();
         }
     }, delay);
-    
-    console.log(`⏱️ Delay set to: ${delay}ms`);
 }
 
-/**
- * Set the game to ready state (user should click now)
- */
 function setReadyState() {
     game.state = GameState.READY;
-    game.startTime = performance.now(); // High precision timestamp
-    
-    // Play scream sound
-    sounds.scream();
+    game.startTime = performance.now();
+    // Sound removed
     
     updateGameUI({
         icon: '💀',
-        title: 'ESCAPE NOW!',
-        message: 'Click to escape the haunted chamber!',
+        title: 'ESCAPE NOW OR DIE!',
+        message: 'CLICK TO SAVE YOUR SOUL!',
         showButton: false
     });
-    
-    console.log('✅ Ready state activated!');
 }
 
-/**
- * Handle successful click (user clicked at the right time)
- */
 function handleSuccessfulClick() {
     const endTime = performance.now();
     const reactionTime = Math.round(endTime - game.startTime);
     
-    // Play escape sound
-    sounds.escape();
+    // Sound removed
     
-    // Store reaction time
-    game.reactionTimes.push(reactionTime);
-    if (game.reactionTimes.length > game.config.maxAttempts) {
-        game.reactionTimes.shift(); // Keep only last N attempts
+    // Play evil.mp3 for 3 seconds
+    if (game.soundEnabled) {
+        game.evilSound.currentTime = 0; // Reset to start
+        game.evilSound.play().catch(err => console.log('Evil sound blocked:', err));
+        
+        // Stop after 3 seconds
+        setTimeout(() => {
+            game.evilSound.pause();
+            game.evilSound.currentTime = 0;
+        }, 3000);
     }
     
-    // Update best time
+    game.reactionTimes.push(reactionTime);
+    if (game.reactionTimes.length > game.config.maxAttempts) {
+        game.reactionTimes.shift();
+    }
+    
     if (!game.bestTime || reactionTime < game.bestTime) {
         game.bestTime = reactionTime;
         localStorage.setItem('bestTime', game.bestTime);
-        console.log('🏆 New best time!');
     }
     
-    // Set success state
     game.state = GameState.SUCCESS;
-    
-    // Determine performance message
-    const performanceMessage = getPerformanceMessage(reactionTime);
     
     updateGameUI({
         icon: getPerformanceIcon(reactionTime),
         title: `${reactionTime}ms`,
-        message: performanceMessage,
+        message: getPerformanceMessage(reactionTime),
         showButton: true,
-        buttonText: '🎃 FACE YOUR FEARS AGAIN 🎃'
+        buttonText: '🎃 FACE DEATH AGAIN 🎃'
     });
     
-    // Update stats display
     updateStatsDisplay(reactionTime);
-    
-    console.log(`⚡ Reaction time: ${reactionTime}ms`);
 }
 
-/**
- * Handle early click (user clicked before color change)
- */
 function handleEarlyClick() {
-    // Clear the timeout
     if (game.timeoutId) {
         clearTimeout(game.timeoutId);
     }
     
-    // Play death sound
-    sounds.death();
+    // Sound effects removed
+    
+    // Play evil.mp3 for 3 seconds
+    if (game.soundEnabled) {
+        game.evilSound.currentTime = 0; // Reset to start
+        game.evilSound.play().catch(err => console.log('Evil sound blocked:', err));
+        
+        // Stop after 3 seconds
+        setTimeout(() => {
+            game.evilSound.pause();
+            game.evilSound.currentTime = 0;
+        }, 3000);
+    }
     
     game.state = GameState.EARLY;
     
     updateGameUI({
         icon: '☠️',
-        title: 'TOO EARLY!',
-        message: 'The spirits caught you! Wait for the green light before escaping!',
+        title: 'YOU DIED!',
+        message: 'The demons devoured your soul! Wait for the GREEN light before clicking!',
         showButton: true,
-        buttonText: '🔄 TRY TO ESCAPE AGAIN'
+        buttonText: '🔄 RISE FROM THE DEAD'
     });
-    
-    console.log('❌ Early click detected!');
 }
 
-/**
- * Handle click on the game box
- */
 function handleGameBoxClick(event) {
-    // Ignore clicks on buttons or other interactive elements
     if (event.target.tagName === 'BUTTON' || event.target.closest('button')) {
         return;
     }
     
-    // Only handle clicks when in READY or WAITING state
     if (game.state === GameState.READY) {
         handleSuccessfulClick();
     } else if (game.state === GameState.WAITING) {
         handleEarlyClick();
     }
-    // Ignore clicks in all other states (IDLE, SUCCESS, EARLY)
 }
 
 // ===================================
 // UI UPDATE FUNCTIONS
 // ===================================
 
-/**
- * Update the game UI with new content and state
- * @param {Object} options - UI configuration options
- */
 function updateGameUI(options) {
     const {
         icon = '🕷️',
         title = '',
         message = '',
         showButton = false,
-        buttonText = '🎃 ENTER IF YOU DARE 🎃'
+        buttonText = '🎃 ENTER THE NIGHTMARE 🎃'
     } = options;
     
-    // Update content
     elements.gameContent.innerHTML = `
         <div class="icon">${icon}</div>
         <h2 id="gameTitle">${title}</h2>
@@ -398,39 +370,26 @@ function updateGameUI(options) {
         ${showButton ? `<button class="btn btn-primary" id="startBtn"><span>${buttonText}</span></button>` : ''}
     `;
     
-    // Re-attach event listener if button exists
     if (showButton) {
         const newBtn = document.getElementById('startBtn');
         newBtn.addEventListener('click', startGame);
     }
     
-    // Update game box state class
     elements.gameBox.className = 'game-box';
     elements.gameBox.classList.add(`state-${game.state}`);
 }
 
-/**
- * Update the statistics display
- * @param {number} currentTime - Current reaction time (optional)
- */
 function updateStatsDisplay(currentTime = null) {
-    // Update current time
     if (currentTime !== null) {
         elements.currentTime.textContent = `${currentTime}ms`;
-        elements.currentTime.style.animation = 'none';
-        setTimeout(() => {
-            elements.currentTime.style.animation = 'iconFloat 3s ease-in-out infinite';
-        }, 10);
     }
     
-    // Update best time
     if (game.bestTime) {
         elements.bestTime.textContent = `${game.bestTime}ms`;
     } else {
         elements.bestTime.textContent = '---';
     }
     
-    // Update average time
     if (game.reactionTimes.length > 0) {
         const average = Math.round(
             game.reactionTimes.reduce((sum, time) => sum + time, 0) / game.reactionTimes.length
@@ -445,96 +404,64 @@ function updateStatsDisplay(currentTime = null) {
 // UTILITY FUNCTIONS
 // ===================================
 
-/**
- * Generate a random delay between min and max
- * @returns {number} Random delay in milliseconds
- */
 function getRandomDelay() {
     const { minDelay, maxDelay } = game.config;
     return Math.floor(Math.random() * (maxDelay - minDelay + 1)) + minDelay;
 }
 
-/**
- * Get performance message based on reaction time (Horror themed)
- * @param {number} time - Reaction time in milliseconds
- * @returns {string} Performance message
- */
 function getPerformanceMessage(time) {
     if (time < 150) {
-        return '� LEGENDARY! You escaped the spirits with supernatural speed!';
+        return '👻 SUPERNATURAL! You escaped death with godlike reflexes!';
     } else if (time < 200) {
-        return '⚡ AMAZING! The darkness couldn\'t catch you!';
+        return '⚡ INCREDIBLE! The demons couldn\'t catch your soul!';
     } else if (time < 250) {
-        return '🦇 GREAT! You\'re faster than a vampire\'s bite!';
+        return '🦇 EXCELLENT! You\'re faster than a vampire\'s strike!';
     } else if (time < 300) {
-        return '�️ GOOD! The spiders are getting closer...';
+        return '🕷️ DECENT! The spiders are crawling closer...';
     } else if (time < 400) {
-        return '🧟 SLOW! The zombies almost got you!';
+        return '🧟 TOO SLOW! The zombies almost feasted on you!';
     } else {
-        return '☠️ TOO SLOW! The spirits are laughing at you...';
+        return '☠️ PATHETIC! Death is laughing at your weakness...';
     }
 }
 
-/**
- * Get performance icon based on reaction time (Horror themed)
- * @param {number} time - Reaction time in milliseconds
- * @returns {string} Performance icon
- */
 function getPerformanceIcon(time) {
-    if (time < 150) {
-        return '👻';
-    } else if (time < 200) {
-        return '⚡';
-    } else if (time < 250) {
-        return '🦇';
-    } else if (time < 300) {
-        return '�️';
-    } else if (time < 400) {
-        return '🧟';
-    } else {
-        return '☠️';
-    }
+    if (time < 150) return '👻';
+    else if (time < 200) return '⚡';
+    else if (time < 250) return '🦇';
+    else if (time < 300) return '🕷️';
+    else if (time < 400) return '🧟';
+    else return '☠️';
 }
 
-/**
- * Reset game statistics (for debugging or user request)
- */
 function resetStats() {
     game.reactionTimes = [];
     game.bestTime = null;
     localStorage.removeItem('bestTime');
     updateStatsDisplay();
-    console.log('📊 Statistics reset!');
 }
 
 // ===================================
-// KEYBOARD SHORTCUTS (BONUS FEATURE)
+// KEYBOARD SHORTCUTS
 // ===================================
 
-/**
- * Handle keyboard shortcuts
- */
 document.addEventListener('keydown', (event) => {
-    // Space or Enter to start game when idle
     if ((event.code === 'Space' || event.code === 'Enter') && 
         (game.state === GameState.IDLE || game.state === GameState.SUCCESS || game.state === GameState.EARLY)) {
         event.preventDefault();
         startGame();
     }
     
-    // Space to click when ready
     if (event.code === 'Space' && game.state === GameState.READY) {
         event.preventDefault();
         handleSuccessfulClick();
     }
     
-    // R to reset stats (hidden feature)
     if (event.code === 'KeyR' && event.ctrlKey) {
         event.preventDefault();
         resetStats();
     }
     
-    // M to toggle sound
     if (event.code === 'KeyM') {
         event.preventDefault();
         toggleSound();
@@ -545,24 +472,19 @@ document.addEventListener('keydown', (event) => {
 // VISIBILITY CHANGE HANDLER
 // ===================================
 
-/**
- * Handle page visibility changes (pause game if user switches tabs)
- */
 document.addEventListener('visibilitychange', () => {
     if (document.hidden && game.state === GameState.WAITING) {
-        // User switched tabs while waiting - reset to avoid unfair advantage
         if (game.timeoutId) {
             clearTimeout(game.timeoutId);
         }
         game.state = GameState.IDLE;
         updateGameUI({
             icon: '🦇',
-            title: 'The Spirits Await...',
-            message: 'Click below to re-enter the haunted chamber',
+            title: 'THE DARKNESS AWAITS...',
+            message: 'Click below to re-enter the nightmare realm',
             showButton: true,
-            buttonText: '🎃 ENTER IF YOU DARE 🎃'
+            buttonText: '🎃 ENTER THE NIGHTMARE 🎃'
         });
-        console.log('⏸️ Game paused due to tab switch');
     }
 });
 
@@ -570,21 +492,23 @@ document.addEventListener('visibilitychange', () => {
 // START THE GAME
 // ===================================
 
-// Initialize when DOM is fully loaded
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
 } else {
     init();
 }
 
-// ===================================
-// CONSOLE EASTER EGG
-// ===================================
+// Add fadeOut animation to CSS dynamically
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes fadeOut {
+        from { opacity: 1; }
+        to { opacity: 0; }
+    }
+`;
+document.head.appendChild(style);
 
-console.log('%c👻 HAUNTED REACTION GAME 👻', 'font-size: 20px; font-weight: bold; color: #8b0000;');
-console.log('%c⚰️ Dare to enter? ⚰️', 'font-size: 14px; font-weight: bold; color: #ff0000;');
-console.log('• Press Space or Enter to start the game');
-console.log('• Press M to toggle sound effects');
-console.log('• Press Ctrl+R to reset your statistics');
-console.log('• Can you escape the spirits in under 150ms?');
-console.log('\n%cGood luck... you\'ll need it! 💀', 'font-size: 14px; color: #8b0000;');
+console.log('%c💀 EXTREME HORROR REACTION GAME 💀', 'font-size: 24px; font-weight: bold; color: #ff0000; text-shadow: 0 0 10px #ff0000;');
+console.log('%c⚰️ ENTER IF YOU DARE ⚰️', 'font-size: 16px; font-weight: bold; color: #8b0000;');
+console.log('%c🩸 WARNING: EXTREME ADULT HORROR 🩸', 'font-size: 14px; color: #ff0000;');
+console.log('Your soul belongs to us now... 💀');
