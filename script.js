@@ -204,6 +204,8 @@ function showLoadingScreen() {
     loadingScreen.style.display = 'flex';
     loadingScreen.style.animation = 'fadeIn 0.3s ease';
     
+    console.log('📺 Loading screen displayed');
+    
     const horrorMessages = [
         'Awakening the demons...',
         'Opening the gates of hell...',
@@ -217,21 +219,32 @@ function showLoadingScreen() {
     
     let progress = 0;
     let messageIndex = 0;
+    const startTime = Date.now();
+    const minimumLoadTime = 3000; // Minimum 3 seconds on screen
     
     const loadingInterval = setInterval(() => {
-        progress += Math.random() * 15 + 5;
+        // Slower progress increment for better visibility on mobile
+        progress += Math.random() * 5 + 3; // 3-8 per tick (was 5-20)
         
         if (progress >= 100) {
             progress = 100;
+            loadingBar.style.width = '100%';
             clearInterval(loadingInterval);
-            // Sound removed
+            
+            // Calculate how much time has passed
+            const elapsedTime = Date.now() - startTime;
+            const remainingTime = Math.max(0, minimumLoadTime - elapsedTime);
+            
+            console.log(`✅ Loading complete. Elapsed: ${elapsedTime}ms, Waiting: ${remainingTime}ms`);
+            
+            // Wait for minimum time before hiding
             setTimeout(() => {
                 loadingScreen.style.animation = 'fadeOut 0.8s ease forwards';
                 setTimeout(() => {
                     loadingScreen.style.display = 'none';
                     initializeGame();
                 }, 800);
-            }, 500);
+            }, remainingTime + 500);
         }
         
         loadingBar.style.width = progress + '%';
@@ -239,9 +252,9 @@ function showLoadingScreen() {
         if (progress > (messageIndex + 1) * 12.5 && messageIndex < horrorMessages.length - 1) {
             messageIndex++;
             loadingText.textContent = horrorMessages[messageIndex];
-            // Sound effects removed
+            console.log('💀', horrorMessages[messageIndex]);
         }
-    }, 200);
+    }, 300); // Slower interval: 300ms instead of 200ms
 }
 
 function initializeGame() {
