@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Test your reaction time in this haunted horror-themed game. Dare to click when the spirits awaken!">
+    <title>👻 Haunted Reaction - Escape the Darkness</title>
+    
+    <!-- Google Fonts - Creepy Horror Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Creepster&family=Nosifer&family=Eater&family=Butcherman&family=Rubik+Wet+Paint&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Haunted animated background -->
+    <div class="background-gradient"></div>
+    <div class="fog"></div>
+    <div class="spiders"></div>
+    
+    <!-- Sound toggle button -->
+    <button class="sound-toggle" id="soundToggle" aria-label="Toggle sound">
+        🔊
+    </button>
+    
+    <!-- Main container -->
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="blood-drip"></div>
+            <h1 class="title">💀 ESCAPE OR DIE 💀</h1>
+            <p class="subtitle">⚰️ THE DEAD ARE WATCHING... REACT OR PERISH ⚰️</p>
+            <p class="warning">🩸 WARNING: EXTREME HORROR AHEAD 🩸</p>
+        </header>
+
+        <!-- Stats Display -->
+        <div class="stats-container">
+            <div class="stat-card">
+                <div class="stat-label">💀 LAST DEATH TIME</div>
+                <div class="stat-value" id="currentTime">---</div>
+            </div>
+            <div class="stat-card highlight">
+                <div class="stat-label">🏆 FASTEST ESCAPE</div>
+                <div class="stat-value" id="bestTime">---</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">⏱️ DEATH AVERAGE</div>
+                <div class="stat-value" id="avgTime">---</div>
+            </div>
+        </div>
+
+        <!-- Game Area -->
+        <div class="game-container">
+            <div class="game-box" id="gameBox">
+                <div class="game-content" id="gameContent">
+                    <div class="icon">🕷️</div>
+                    <h2 id="gameTitle">ENTER THE DEATH CHAMBER?</h2>
+                    <p id="gameMessage">Your soul will be tested... Click if you dare face death...</p>
+                    <button class="btn btn-primary" id="startBtn">🎃 ENTER THE NIGHTMARE 🎃</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Instructions -->
+        <div class="instructions">
+            <h3>🕯️ HOW TO SURVIVE THE NIGHTMARE 🕯️</h3>
+            <div class="instruction-grid">
+                <div class="instruction-item">
+                    <span class="step-number">💀</span>
+                    <p>Enter the death chamber</p>
+                </div>
+                <div class="instruction-item">
+                    <span class="step-number">👁️</span>
+                    <p>Wait for the demon's signal</p>
+                </div>
+                <div class="instruction-item">
+                    <span class="step-number">⚡</span>
+                    <p>Click to escape or DIE!</p>
+                </div>
+                <div class="instruction-item">
+                    <span class="step-number">🏃</span>
+                    <p>Survive faster than death itself</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>🦇 CREATED IN THE DEPTHS OF HELL 🦇</p>
+            <p class="footer-warning">⚠️ NOT FOR THE FAINT OF HEART ⚠️</p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
