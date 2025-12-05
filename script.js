@@ -73,17 +73,35 @@ const elements = {
 // ===================================
 
 function init() {
-    // Start background music immediately
-    if (game.soundEnabled) {
-        game.bgMusic.play().catch(err => {
-            console.log('Background music autoplay blocked. Will retry on user interaction.');
-            // Retry on first user interaction
-            document.addEventListener('click', () => {
-                if (game.soundEnabled && game.bgMusic.paused) {
-                    game.bgMusic.play().catch(e => console.log('Still blocked:', e));
-                }
-            }, { once: true });
-        });
+    // Unmute and try to start background music immediately
+    if (game.soundEnabled && game.bgMusic) {
+        game.bgMusic.muted = false;
+        game.bgMusic.volume = 0.5;
+        
+        // Try to play immediately
+        const playPromise = game.bgMusic.play();
+        
+        if (playPromise !== undefined) {
+            playPromise.then(() => {
+                console.log('🎵 Background music started successfully!');
+            }).catch(err => {
+                console.log('⚠️ Autoplay blocked. Music will start on first interaction.');
+                
+                // Try to play on ANY user interaction
+                const startMusic = () => {
+                    if (game.soundEnabled && game.bgMusic.paused) {
+                        game.bgMusic.play()
+                            .then(() => console.log('🎵 Music started after user interaction!'))
+                            .catch(e => console.log('Music still blocked:', e));
+                    }
+                };
+                
+                // Listen for multiple interaction types
+                document.addEventListener('click', startMusic, { once: true });
+                document.addEventListener('touchstart', startMusic, { once: true });
+                document.addEventListener('keydown', startMusic, { once: true });
+            });
+        }
     }
     
     setupAgeGate();
@@ -100,6 +118,12 @@ function setupAgeGate() {
     
     ageYes.addEventListener('click', () => {
         game.ageVerified = true;
+        
+        // Start music immediately on user interaction
+        if (game.soundEnabled && game.bgMusic.paused) {
+            game.bgMusic.play().catch(err => console.log('Music play failed:', err));
+        }
+        
         ageGate.style.animation = 'fadeOut 0.5s ease forwards';
         setTimeout(() => {
             ageGate.style.display = 'none';
@@ -124,6 +148,10 @@ function showLoadingScreen() {
     const loadingScreen = document.getElementById('loadingScreen');
     const loadingBar = document.getElementById('loadingBar');
     const loadingText = document.getElementById('loadingText');
+    
+    // Make sure loading screen is visible
+    loadingScreen.style.display = 'flex';
+    loadingScreen.style.animation = 'fadeIn 0.3s ease';
     
     const horrorMessages = [
         'Awakening the demons...',
